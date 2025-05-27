@@ -1,0 +1,39 @@
+---
+title: "Homework 3 Output"
+author: Mike Maccia
+format: pdf
+editor: visual
+---
+
+Loading libraries
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Task 1
+
+###Question a: Why `read_csv` cannot be used to read the data.txt file
+
+The function `read_csv()` can only be used to read in files that use the delimeters of commas or tabs. The function `read_csv2()` must be used in files with semicolons as the separator (commas can be used for decimal points).
+
+
+
+```{r}
+data <- read_csv2('~/ST558 Repo/Homework3/Data/data.txt',
+                  col_names= TRUE)
+data
+```
+
+###Question b: Reading in 2nd file
+
+In this file, "6" is the delimeter.
+
+```{r}
+data_2 <- read_delim('~/ST558 Repo/Homework3/Data/data2.txt',
+                     delim = '6',
+                     col_types= 'fdc')
+
+data_2
+```

@@ -14,11 +14,9 @@ library(palmerpenguins)
 
 ## Task 1
 
-###Question a: Why `read_csv` cannot be used to read the data.txt file
+### Question a: Why `read_csv` cannot be used to read the data.txt file
 
 The function `read_csv()` can only be used to read in files that use the delimeters of commas or tabs. The function `read_csv2()` must be used in files with semicolons as the separator (commas can be used for decimal points).
-
-
 
 ```{r}
 data <- read_csv2('~/ST558 Repo/Homework3/Data/data.txt',
@@ -26,7 +24,7 @@ data <- read_csv2('~/ST558 Repo/Homework3/Data/data.txt',
 data
 ```
 
-###Question b: Reading in 2nd file
+### Question b: Reading in 2nd file
 
 In this file, "6" is the delimeter.
 
@@ -37,3 +35,49 @@ data_2 <- read_delim('~/ST558 Repo/Homework3/Data/data2.txt',
 
 data_2
 ```
+
+## Task 2
+
+Data tidying skills
+
+### Question a: Reading Data
+
+Reading in the `trailblazer.csv` data
+
+```{r}
+trailblazer <- read_csv('~/ST558 Repo/Homework3/Data/trailblazer.csv',
+                   col_names= TRUE)
+trailblazer
+```
+
+### Question b: Pivoting the data longer
+
+```{r}
+trailblazer_longer <- trailblazer |> 
+    pivot_longer(cols = 2:11,
+                 names_to = c('Game', 'Location'),
+                 names_prefix = 'Game',
+                 names_sep = '_',
+                 values_to = 'Points')
+
+print(trailblazer_longer, n=5) 
+```
+
+### Question c: Who scored more when playing at home versus away
+
+```{r}
+trailblazer_wider <- trailblazer_longer |> 
+    mutate(Game = as.integer(Game)) |> 
+    pivot_wider(names_from = ('Location'),
+                 values_from = 'Points') |> 
+          group_by(Player) |> 
+            mutate(mean_home = mean(Home, na.rm=TRUE),
+                   mean_away = mean(Away, na.rm=TRUE),
+                   diff_points = (mean_home - mean_away)) |> 
+                      arrange(desc(diff_points))
+             
+
+print(trailblazer_wider, n = 25)
+```
+
+While they did not necessarily score the most points, Jusuf Nurkic (6.67) and Robert Covington (6.5) scored on average more points at home than away through the first 10 games of the season.

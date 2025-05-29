@@ -95,13 +95,29 @@ While they did not necessarily score the most points, Jusuf Nurkic (6.67) and Ro
 ### Question b. Creating a new table
 
 ```{r}
-penguins |> 
+penguins_island_ct <- penguins |> 
   select(species, island) |> 
   group_by(species, island) |> 
   summarise(n = n(), .groups='drop', ) |> 
   pivot_wider(
     names_from = island, values_from = n, values_fill = 0) 
+
+penguins_island_ct
   
 ```
 
+## Task 4
+
+Replacing 2 missing values for bill length
+
+```{r}
+penguins_fixed_bill_length <- penguins |> 
+  mutate(bill_length_mm = case_when(species == "Gentoo" & is.na(bill_length_mm) ~ 30, TRUE ~
+                                      bill_length_mm )) |> 
+  mutate(bill_length_mm = case_when(species == "Adelie" & is.na(bill_length_mm) ~ 26, TRUE ~
+                                      bill_length_mm )) |> 
+  arrange(bill_length_mm)
+
+print(penguins_fixed_bill_length, n = 10)
+```
 

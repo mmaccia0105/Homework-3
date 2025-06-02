@@ -1,5 +1,5 @@
 ---
-title: "Homework 3 Output"
+title: "Homework 3 Output - Using the Tidyverse"
 author: Mike Maccia
 format: pdf
 editor: visual
@@ -19,8 +19,8 @@ library(palmerpenguins)
 The function `read_csv()` can only be used to read in files that use the delimeters of commas or tabs. The function `read_csv2()` must be used in files with semicolons as the separator (commas can be used for decimal points).
 
 ```{r}
-data <- read_csv2('~/ST558 Repo/Homework3/Data/data.txt',
-                  col_names= TRUE)
+data <- read.csv2('~/ST558 Repo/Homework3/Data/data.txt',
+                  header = T)
 data
 ```
 
@@ -58,26 +58,29 @@ trailblazer_longer <- trailblazer |>
                  names_to = c('Game', 'Location'),
                  names_prefix = 'Game',
                  names_sep = '_',
-                 values_to = 'Points')
+                 values_to = 'Points') 
 
-print(trailblazer_longer, n=5) 
+print(trailblazer_longer, n=5)
+
 ```
 
 ### Question c: Who scored more when playing at home versus away
 
 ```{r}
-trailblazer_wider <- trailblazer_longer |> 
-    mutate(Game = as.integer(Game)) |> 
-    pivot_wider(names_from = ('Location'),
-                 values_from = 'Points') |> 
-          group_by(Player) |> 
-            mutate(mean_home = mean(Home, na.rm=TRUE),
-                   mean_away = mean(Away, na.rm=TRUE),
-                   diff_points = (mean_home - mean_away)) |> 
-                      arrange(desc(diff_points))
-             
 
-print(trailblazer_wider, n = 25)
+library(kableExtra)
+
+trailblazer_wider <- trailblazer_longer |> 
+    pivot_wider(names_from = (Location),
+                 values_from = Points) |> 
+    group_by(Player) |> 
+    summarize(mean_home = mean(Home, na.rm=T),
+              mean_away = mean (Away, na.rm=T)) |> 
+    mutate(diff_points = (mean_home - mean_away)) |> 
+    arrange(desc(diff_points)) |> 
+    kbl(digits=2)
+
+trailblazer_wider
 ```
 
 While they did not necessarily score the most points, Jusuf Nurkic (6.67) and Robert Covington (6.5) scored on average more points at home than away through the first 10 games of the season.
@@ -86,21 +89,18 @@ While they did not necessarily score the most points, Jusuf Nurkic (6.67) and Ro
 
 ### Question a. Describing what some values mean
 
-<NULL> indicates that there were no values within a column. For example, there were no bill_length measurements for Gentoo species on Torgersen island. 
+<NULL> indicates that there were no values within a column. For example, there were no bill_length measurements for Gentoo species on Torgersen island.
 
-<dbl [52]> indicates that within that cell there would are 52 observations (which are doubles) for bill length. 
+\<dbl \[52\]\> indicates that within that cell there would are 52 observations (which are doubles) for bill length.
 
-<list> indicates a list-column within a tribble. List-columns occur when each element within a column is a list. For example, the above cell of Adelie species on Torgersen island, there is a list of 52 doubles within that cell / element. 
+<list> indicates a list-column within a tribble. List-columns occur when each element within a column is a list. For example, the above cell of Adelie species on Torgersen island, there is a list of 52 doubles within that cell / element.
 
 ### Question b. Creating a new table
 
 ```{r}
 penguins_island_ct <- penguins |> 
   select(species, island) |> 
-  group_by(species, island) |> 
-  summarise(n = n(), .groups='drop', ) |> 
-  pivot_wider(
-    names_from = island, values_from = n, values_fill = 0) 
+  summarize(.groups = island)
 
 penguins_island_ct
   
@@ -120,4 +120,3 @@ penguins_fixed_bill_length <- penguins |>
 
 print(penguins_fixed_bill_length, n = 10)
 ```
-
